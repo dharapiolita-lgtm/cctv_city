@@ -75,9 +75,9 @@ export default function LoginPage() {
               <div className="w-14 h-14 rounded-2xl bg-teal-500/20 border border-teal-400/40 flex items-center justify-center text-teal-400 mx-auto mb-4 shadow-lg">
                 <Radio className="w-8 h-8 animate-pulse" />
               </div>
-              <h1 className="text-2xl font-extrabold tracking-tight">WaterWatch</h1>
+              <h1 className="text-2xl font-extrabold tracking-tight">CCTV Analitik</h1>
               <p className="text-xs text-slate-300 mt-1 font-medium">
-                Sistem Monitoring Command Center CCTV Analitik Keamanan Kota
+                Sistem Command Center Monitoring Keamanan Kota Cerdas
               </p>
             </div>
 

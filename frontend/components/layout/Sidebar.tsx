@@ -109,12 +109,12 @@ export default function Sidebar() {
             </div>
             <div>
               <h1 className="font-extrabold text-xl tracking-tight text-white flex items-center gap-1.5">
-                WaterWatch
+                CCTV Analitik
                 <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/30">
-                  CCTV
+                  Kota
                 </span>
               </h1>
-              <p className="text-[11px] text-slate-400 font-medium tracking-wide">Command Center Kota</p>
+              <p className="text-[11px] text-slate-400 font-medium tracking-wide">Command Center Keamanan Kota</p>
             </div>
           </Link>
         </div>

@@ -23,7 +23,7 @@ export async function apiFetch<T>(
   headers.set('Content-Type', 'application/json');
 
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('waterwatch_token');
+    const token = localStorage.getItem('cctvcity_token');
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
@@ -49,8 +49,8 @@ export async function apiFetch<T>(
     }
 
     if (response.status === 401 && typeof window !== 'undefined') {
-      localStorage.removeItem('waterwatch_token');
-      localStorage.removeItem('waterwatch_user');
+      localStorage.removeItem('cctvcity_token');
+      localStorage.removeItem('cctvcity_user');
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login?expired=true';
       }

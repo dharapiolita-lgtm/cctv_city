@@ -29,14 +29,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      const token = localStorage.getItem('waterwatch_token');
+      const token = localStorage.getItem('cctvcity_token');
       if (!token) {
         setUser(null);
         setLoading(false);
         return;
       }
 
-      const cachedUser = localStorage.getItem('waterwatch_user');
+      const cachedUser = localStorage.getItem('cctvcity_user');
       if (cachedUser) {
         setUser(JSON.parse(cachedUser));
       }
@@ -44,11 +44,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Re-validate token with backend
       const freshUser = await api.get<UserProfile>('/auth/me');
       setUser(freshUser);
-      localStorage.setItem('waterwatch_user', JSON.stringify(freshUser));
+      localStorage.setItem('cctvcity_user', JSON.stringify(freshUser));
     } catch (err) {
       console.warn('Sesi login tidak valid:', err);
-      localStorage.removeItem('waterwatch_token');
-      localStorage.removeItem('waterwatch_user');
+      localStorage.removeItem('cctvcity_token');
+      localStorage.removeItem('cctvcity_user');
       setUser(null);
     } finally {
       setLoading(false);
@@ -60,8 +60,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (token: string, userProfile: UserProfile) => {
-    localStorage.setItem('waterwatch_token', token);
-    localStorage.setItem('waterwatch_user', JSON.stringify(userProfile));
+    localStorage.setItem('cctvcity_token', token);
+    localStorage.setItem('cctvcity_user', JSON.stringify(userProfile));
     setUser(userProfile);
 
     // Redirect sesuai role
@@ -86,8 +86,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // ignore
     } finally {
-      localStorage.removeItem('waterwatch_token');
-      localStorage.removeItem('waterwatch_user');
+      localStorage.removeItem('cctvcity_token');
+      localStorage.removeItem('cctvcity_user');
       setUser(null);
       router.push('/login');
     }

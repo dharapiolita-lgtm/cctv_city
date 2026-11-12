@@ -1,0 +1,309 @@
+PRD: CCTV Analitik untuk Keamanan Kota
+Disusun oleh: Dhara Piolita | Dosen: Dr. Erliyan Redy Susanto, M.Kom | Mata kuliah: Proyek
+Pengembangan Sistem Informasi (UTS) | Versi 0.1 (draf) | 10 November 2026
+Catatan: lima pertanyaan klarifikasi belum dijawab. Hal yang belum pasti ditandai
+[ASUMSI] dan dikumpulkan di bagian 10 (Open Questions). Tidak ada keputusan yang
+dikarang di luar itu.
+1. Problem Statement
+Yang dirugikan:
+Warga: insiden (kecelakaan, kebakaran, kerumunan berbahaya, tindak kriminal)
+terlambat ditangani karena deteksi bergantung pada laporan manual.
+Operator command center: harus memantau banyak layar kamera secara manual,
+mudah lelah, dan insiden terlewat.
+Petugas lapangan: menerima informasi lisan/tidak terstruktur (lokasi dan bukti tidak
+jelas), sehingga respons lambat.
+Pimpinan Pemda: tidak punya data insiden terstruktur untuk evaluasi dan
+pengambilan keputusan.
+Penyebab: rekaman CCTV dipakai terutama untuk forensik setelah kejadian, bukan untuk
+deteksi dini; tidak ada pencatatan insiden dan tindak lanjut yang terpusat.
+Pernyataan masalah: Pemda membutuhkan sistem yang mengubah aliran CCTV menjadi
+event terstruktur, memberi peringatan dini ke operator, dan mencatat penanganan insiden
+dari awal sampai selesai.
+2. Target User dan Persona
+Pengguna: operator command center, petugas lapangan, admin sistem, pimpinan Pemda.
+[ASUMSI] pengguna prioritas MVP adalah operator command center (lihat Open
+Question 1).
+Persona 1: Rina, Operator Command Center (usia 29)
+Memantau 20+ kamera per shift 8 jam.
+Kebutuhan: alert yang akurat dan tidak berlebihan, bukti klip singkat, tombol cepat
+untuk eskalasi ke petugas lapangan.PRD: CCTV Analitik untuk K eamanan K ota
+Page 1 of 10
+--- PAGE BREAK ---
+Frustrasi: terlalu banyak false alarm, harus mencari rekaman manual.
+Persona 2: Pak Budi, Petugas Lapangan Satpol PP (usia 41)
+Bekerja dengan ponsel, sinyal tidak selalu stabil.
+Kebutuhan: notifikasi insiden berisi lokasi, jenis, foto/klip bukti, dan tombol
+terima/selesai.
+Frustrasi: instruksi lisan yang tidak jelas, tidak ada catatan tindak lanjut.
+3. Goals dan Non-Goals
+Goals
+1. Menampilkan daftar kamera dan statusnya (online/offline) dalam satu dashboard.
+2. Menghasilkan event deteksi terstruktur dari video (untuk MVP: data simulasi atau
+video sampel [ASUMSI]).
+3. Operator dapat memvalidasi event dan membuat insiden dengan alur status yang
+jelas.
+4. Seluruh tindakan pengguna tercatat dalam audit log.
+5. Akses dibatasi berdasarkan peran (RBAC).
+Non-Goals (MVP)
+Pengenalan wajah (risiko hukum UU PDP; keputusan scope menunggu Open Question
+2).
+Streaming video langsung berskala besar di Vercel (tidak didukung platform).
+Aplikasi mobile native.
+Integrasi ke sistem eksternal (112, kepolisian) dan penindakan otomatis (tilang
+elektronik).
+Pelatihan model AI sendiri.
+4. User Stories
+1. Sebagai operator, saya ingin melihat daftar kamera beserta status online/offline,
+supaya saya tahu kamera mana yang tidak berfungsi.
+2. Sebagai operator, saya ingin menerima alert real-time saat ada event terdeteksi,
+supaya saya bisa bereaksi tanpa menatap semua layar.PRD: CCTV Analitik untuk K eamanan K ota
+Page 2 of 10
+--- PAGE BREAK ---
+3. Sebagai operator, saya ingin melihat bukti (snapshot/klip) di setiap event, supaya saya
+bisa memvalidasi apakah event itu nyata.
+4. Sebagai operator, saya ingin menandai event sebagai valid atau false alarm, supaya
+data bersih dan akurasi bisa diukur.
+5. Sebagai operator, saya ingin membuat insiden dari event valid dan menugaskannya ke
+petugas, supaya penanganan jelas penanggung jawabnya.
+6. Sebagai petugas lapangan, saya ingin menerima penugasan berisi lokasi dan bukti,
+supaya saya bisa langsung bergerak.
+7. Sebagai petugas lapangan, saya ingin memperbarui status insiden (diterima, di lokasi,
+selesai) dengan catatan, supaya operator tahu progresnya.
+8. Sebagai admin, saya ingin mengelola kamera, pengguna, dan peran, supaya akses
+terkontrol.
+9. Sebagai admin, saya ingin melihat audit log, supaya setiap akses dan perubahan data
+bisa ditelusuri.
+10. Sebagai pimpinan, saya ingin melihat dashboard ringkasan insiden per jenis, lokasi,
+dan waktu, supaya saya bisa mengambil keputusan berbasis data.
+5. Daftar Fitur
+MVP
+Login dan RBAC (admin, operator, petugas, pimpinan)
+Manajemen kamera (CRUD, lokasi, status)
+Event deteksi (data simulasi/video sampel) dengan snapshot
+Validasi event (valid / false alarm)
+Manajemen insiden dan penugasan, alur status
+Dashboard ringkasan
+Audit log
+Footer aplikasi: logo Pemda, logo Universitas Teknokrat Indonesia, teks Copyright
+v2
+Jenis analitik tambahan (deteksi kerumunan, intrusi, pelanggaran lalu lintas)
+[ASUMSI: jenis yang masuk MVP ditentukan di Open Question 2]
+Notifikasi push/WhatsApp ke petugas
+Peta interaktif lokasi kamera dan insidenPRD: CCTV Analitik untuk K eamanan K ota
+Page 3 of 10
+--- PAGE BREAK ---
+Ekspor laporan PDF/Excel
+Integrasi kamera nyata (RTSP/ONVIF)
+Nanti
+ANPR (pembacaan plat nomor)
+Pengenalan wajah (hanya jika disetujui secara hukum)
+Pemrosesan edge
+Integrasi 112 dan kepolisian
+Analitik prediktif (titik rawan)
+6. Functional Requirements (MVP)
+FR-1 Login dan RBAC
+Autentikasi email/username + kata sandi; kata sandi di-hash dengan Argon2.
+Sesi memakai token JWT dengan masa berlaku terbatas.
+Peran: admin, operator, petugas, pimpinan. Setiap endpoint memeriksa peran.
+Login gagal berulang (5 kali) mengunci akun sementara. Durasi: lihat Open Question 8.
+FR-2 Manajemen Kamera
+Admin dapat membuat, mengubah, menonaktifkan kamera: nama, lokasi (lat/long,
+alamat), sumber stream/video sampel, status.
+Status kamera: online, offline, nonaktif. Status offline ditentukan dari heartbeat atau
+kegagalan pembacaan sumber.
+Operator dapat melihat daftar dan detail kamera (read-only).
+FR-3 Event Deteksi
+Sistem menyimpan event: kamera, jenis, waktu, skor kepercayaan, path snapshot/klip.
+MVP: event dibuat oleh modul simulator atau pemrosesan video sampel [ASUMSI].
+Event baru tampil ke operator tanpa reload halaman (SSE atau WebSocket).
+Event dengan skor di bawah ambang batas tidak ditampilkan sebagai alert (nilai
+ambang: Open Question 9).
+FR-4 Validasi Event
+Operator menandai event: valid atau false alarm (wajib memilih salah satu).PRD: CCTV Analitik untuk K eamanan K ota
+Page 4 of 10
+--- PAGE BREAK ---
+Event valid dapat dikonversi menjadi insiden. Satu event hanya boleh terhubung ke
+satu insiden.
+FR-5 Manajemen Insiden
+Insiden memiliki jenis, tingkat keparahan (rendah/sedang/tinggi), lokasi, deskripsi, dan
+petugas yang ditugaskan.
+Alur status: baru, ditugaskan, diterima, di lokasi, selesai, ditutup. Transisi di luar alur
+ditolak.
+Setiap perubahan status menyimpan waktu, pelaku, dan catatan.
+FR-6 Dashboard
+Menampilkan jumlah kamera online/offline, jumlah event hari ini, insiden terbuka, dan
+rata-rata waktu respons.
+Grafik insiden per jenis dan per hari (rentang yang dipilih pengguna).
+Pimpinan hanya dapat melihat (tidak mengubah data).
+FR-7 Audit Log
+Mencatat login, perubahan data, validasi event, dan perubahan status insiden: pelaku,
+aksi, objek, waktu, IP.
+Log tidak dapat diubah atau dihapus dari aplikasi (insert-only). Masa simpan: Open
+Question 7.
+FR-8 Footer Aplikasi
+Tampil di semua halaman, termasuk halaman login.
+Berisi logo Pemda, logo Universitas Teknokrat Indonesia, dan teks: Copyright©2026 by
+Dhara Piolita dan Dr. Erliyan Redy Susanto, M.Kom.
+File logo resmi disediakan pemilik (lihat Open Question 10); jika gambar gagal dimuat,
+teks alternatif tetap tampil.
+7. Sketsa Data Model
+Entitas Field kunci
+users id (UUID), nama, username, password_hash, role,
+aktif, last_login_atPRD: CCTV Analitik untuk K eamanan K ota
+Page 5 of 10
+--- PAGE BREAK ---
+Relasi: camera 1:N event; event 1:0..1 incident; incident 1:N incident_updates; user 1:N
+audit_logs.
+8. Edge Case dan Failure StateEntitas Field kunci
+cameras id, nama, lokasi_lat, lokasi_lng, alamat,
+sumber_stream, status, last_seen_at
+detection_eventsid, camera_id, jenis, skor, waktu_deteksi,
+snapshot_path, validasi (null/valid/false_alarm),
+divalidasi_oleh, divalidasi_pada
+incidents id, event_id (unik), jenis, keparahan, status,
+deskripsi, dibuat_oleh, ditugaskan_ke,
+dibuat_pada, selesai_pada
+incident_updatesid, incident_id, status_lama, status_baru, catatan,
+oleh, waktu
+audit_logs id, user_id, aksi, objek_tipe, objek_id, ip, waktu,
+detail (JSONB)
+Kondisi Perilaku yang diharapkan
+Kamera offline atau stream putus Status berubah ke offline, dashboard
+menandai, event baru tidak dibuat; pulih
+otomatis saat sumber kembali
+Lonjakan event (banyak event dalam waktu
+singkat)Event tetap disimpan; tampilan operator
+dibatasi/dikelompokkan agar tidak
+membanjiri; batas: Open Question 9
+Event duplikat (kamera sama, jenis sama,
+jeda sangat singkat)Digabung dalam jendela waktu tertentu (nilai:
+Open Question 9)
+False alarm tinggi Operator menandai false alarm; angka false
+positive rate muncul di dashboard
+Dua operator memvalidasi event yang samaYang pertama berhasil; yang kedua menerima
+pesan konflik, data tidak tertimpaPRD: CCTV Analitik untuk K eamanan K ota
+Page 6 of 10
+--- PAGE BREAK ---
+9. Success Metrics
+Target angka bersifat awal dan perlu disetujui (Open Question 11).Kondisi Perilaku yang diharapkan
+Event valid sudah punya insiden Pembuatan insiden kedua ditolak
+Petugas tidak merespons penugasan Insiden tetap berstatus ditugaskan; operator
+dapat menugaskan ulang (batas waktu
+eskalasi: Open Question 6)
+Petugas offline/sinyal lemah Pembaruan status gagal dengan pesan jelas
+dan dapat dicoba ulang; tidak ada data hilang
+diam-diam
+Snapshot/klip hilang atau gagal dimuat Event tetap tampil dengan placeholder dan
+penanda bukti tidak tersedia
+Token kedaluwarsa Pengguna diarahkan ke login; perubahan yang
+belum disimpan tidak diklaim berhasil
+Akses di luar peran Ditolak (403) dan dicatat di audit log
+Database tidak tersedia Aplikasi menampilkan halaman error yang
+jelas; tidak ada data parsial tersimpan
+(transaksi dibatalkan)
+Logo gagal dimuat Footer tetap menampilkan teks Copyright
+dan teks alternatif logo
+Metrik Target awal (prototipe)
+Semua alur MVP (login, kamera, event, validasi,
+insiden, dashboard) berjalan end-to-end pada
+demo100% skenario uji lulus
+Latensi event masuk sampai tampil di layar
+operatorkurang dari 5 detik
+Waktu dari event ke insiden ditugaskan (simulasi) kurang dari 2 menit
+Cakupan RBAC: percobaan akses di luar peran
+ditolak100%PRD: CCTV Analitik untuk K eamanan K ota
+Page 7 of 10
+--- PAGE BREAK ---
+Metrik tahap pilot (di luar MVP): precision deteksi, false positive rate, rata-rata waktu
+respons nyata.
+10. Open Questions
+1. Siapa pengguna prioritas MVP: operator command center, petugas lapangan, atau
+pimpinan?
+2. Jenis analitik apa yang wajib di MVP (kerumunan, pelanggaran lalu lintas, ANPR,
+intrusi, kecelakaan/kebakaran, atau tanpa analitik otomatis)? Apakah pengenalan
+wajah di-scope-out secara resmi?
+3. Jumlah kamera di MVP dan sumbernya: video sampel/simulasi atau kamera nyata
+(RTSP/ONVIF)?
+4. Lokasi pemrosesan analitik: cloud, edge, atau belum ditentukan? Boleh memakai
+model pihak ketiga (misalnya YOLO via ONNX) atau API eksternal?
+5. Definisi selesai: prototipe UTS, pilot satu lokasi, atau produksi dengan SLA? Berapa
+batas waktu dan jumlah pengerjanya?
+6. Berapa batas waktu respons petugas sebelum insiden dieskalasi atau ditugaskan
+ulang?
+7. Berapa lama rekaman, snapshot, dan audit log disimpan (kaitan dengan UU PDP)?
+8. Kebijakan kunci akun: berapa percobaan gagal dan berapa lama terkunci?
+9. Nilai ambang skor kepercayaan, jendela penggabungan event duplikat, dan batas
+lonjakan event?
+10. Pemda mana yang dimaksud (misalnya Pemkot Bandar Lampung), dan dari mana file
+logo resmi Pemda dan Universitas Teknokrat Indonesia diperoleh?
+11. Apakah target metrik di bagian 9 disetujui dosen/pemilik proyek?
+12. Apakah ada dasar hukum atau izin pemasangan dan penggunaan rekaman CCTV yang
+harus dirujuk di dokumen?Metrik Target awal (prototipe)
+Seluruh aksi penting tercatat di audit log 100%
+Temuan keamanan tingkat tinggi/kritis yang belum
+diperbaiki saat penyerahan0
+Footer (dua logo + teks Copyright) tampil di semua
+halaman100%PRD: CCTV Analitik untuk K eamanan K ota
+Page 8 of 10
+--- PAGE BREAK ---
+11. Validasi Kelayakan: Rust dan PostgreSQL
+Kesimpulan: layak untuk prototipe MVP dengan catatan pada deployment dan analitik
+video.
+Kebutuhan Pilihan Rust / PostgreSQL Penilaian
+REST API dan
+RBACAxum + Tokio; middleware untuk
+JWT dan pemeriksaan peranLayak
+Akses database SQLx (query terverifikasi saat
+kompilasi) + migrasiLayak
+Hash kata sandi Crate argon2 Layak
+JWT Crate jsonwebtoken Layak
+Validasi input Crate validator / serde dengan tipe
+ketatLayak
+Rate limiting tower-governor atau middleware
+setaraLayak
+Alert real-time SSE atau WebSocket bawaan
+AxumLayak
+Data event,
+insiden, auditPostgreSQL: UUID, timestamptz,
+JSONB, indeks pada (camera_id,
+waktu); partisi tabel event bila
+volume besar; trigger/permission
+untuk audit_logs insert-onlyLayak
+Lokasi kamera Kolom lat/lng sederhana untuk
+MVP; ekstensi PostGIS opsional di
+v2Layak
+Inferensi AI (v2) Crate ort (ONNX Runtime) atau
+layanan terpisahLayak, lebih berat; bukan beban
+MVP karena MVP memakai data
+simulasi
+Ingest video RTSP
+(v2)Binding GStreamer/FFmpeg dari
+RustLayak, kompleks; perlu waktu
+tambahanPRD: CCTV Analitik untuk K eamanan K ota
+Page 9 of 10
+--- PAGE BREAK ---
+Risiko utama dan mitigasi
+1. Batas serverless Vercel membatasi real-time dan video: mitigasi dengan polling untuk
+demo, video sampel berupa file statis, dan analitik berjalan terpisah dari Vercel.
+2. Kompleksitas pipeline video di Rust: mitigasi dengan simulator event di MVP.
+3. Risiko hukum data pribadi (wajah, plat nomor): mitigasi dengan mengeluarkan
+pengenalan wajah dari MVP dan menetapkan masa simpan data.
+4. Waktu pengerjaan: ruang lingkup MVP sengaja dipersempit pada manajemen kamera,
+event, insiden, dan dashboard.
+Validasi terhadap kebutuhan footer: logo dan teks Copyright adalah aset statis di
+komponen layout yang dipakai semua halaman; tidak ada hambatan teknis pada Rust,
+PostgreSQL, maupun Vercel.
+Copyright©2026 by Dhara Piolita dan Dr. Erliyan Redy Susanto, M.KomKebutuhan Pilihan Rust / PostgreSQL Penilaian
+Deploy ke VercelVercel mendukung fungsi Rust
+(serverless) untuk API dan hosting
+frontend statisTerbatas: tidak cocok untuk
+streaming video, WebSocket
+jangka panjang, atau pemrosesan
+berat; SSE/WebSocket mungkin
+perlu diganti polling untuk demo
+Database di
+VercelTidak ada PostgreSQL bawaan
+yang dapat diasumsikan; gunakan
+PostgreSQL terkelola terpisah
+(misalnya Neon atau Supabase)Perlu keputusanPRD: CCTV Analitik untuk K eamanan K ota
+Page 10 of 10

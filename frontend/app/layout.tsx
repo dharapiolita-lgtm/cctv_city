@@ -3,7 +3,7 @@ import './globals.css';
 import { AuthProvider } from '@/lib/auth-context';
 
 export const metadata: Metadata = {
-  title: 'WaterWatch — CCTV Analitik Keamanan Kota',
+  title: 'CCTV Analitik — Command Center Keamanan Kota',
   description: 'Sistem Monitoring Command Center CCTV Analitik untuk Keamanan Kota',
 };
 

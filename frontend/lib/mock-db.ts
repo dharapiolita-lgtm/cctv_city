@@ -93,8 +93,9 @@ class MockDatabase {
   }
 
   seed() {
+    // Real Argon2id hash for 'password123' - verified with hash-wasm
     const defaultHash =
-      '$argon2id$v=19$m=65536,t=3,p=4$lUe8wZ31s+v1Z2vGzP8a9A$3Y+G9zX8bQ0yA5m+7wK6t1j8U5l2P0m9k8J7h6G5f4E'; // matches password123
+      '$argon2id$v=19$m=65536,t=3,p=4$bFV4vM2d9bPr9Wdrxs8emg$+HeIBVr4ze/cAfbwBlQ3JKHJZeQghh8Gv6UhDQnEehE';
 
     this.users = [
       {

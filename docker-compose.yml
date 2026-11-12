@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: waterwatch-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: waterwatch
+      POSTGRES_USER: openpg
+      POSTGRES_PASSWORD: openpgpwd
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/migrations/0001_initial_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./backend/migrations/0002_seed_data.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openpg -d waterwatch"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: waterwatch-backend
+    restart: always
+    environment:
+      DATABASE_URL: postgres://openpg:openpgpwd@postgres:5432/waterwatch
+      JWT_SECRET: waterwatch-super-secret-jwt-key-2026-cctv-secure-dev
+      JWT_EXPIRATION_MINUTES: 480
+      PORT: 8080
+      FRONTEND_ORIGIN: http://localhost:3000
+      EVENT_SIMULATOR_ENABLED: "true"
+      EVENT_SIMULATOR_INTERVAL_SECONDS: 30
+      EVENT_CONFIDENCE_THRESHOLD: "0.60"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: waterwatch-frontend
+    restart: always
+    environment:
+      DATABASE_URL: postgres://openpg:openpgpwd@postgres:5432/waterwatch
+      JWT_SECRET: waterwatch-super-secret-jwt-key-2026-cctv-secure-dev
+      JWT_EXPIRATION_MINUTES: 480
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+
